@@ -21,7 +21,7 @@ go实现分布式shell任务调度
 ![image](https://github.com/sunteng412/mrfox-cron/blob/master/file/WX20200330-223251@2x.png)  
 
 worker内部架构:  
-![image](https://github.com/sunteng412/mrfox-cron/blob/master/file/WX20200330-223251@2x.png)  
+![image](https://github.com/sunteng412/mrfox-cron/blob/master/file/WX20200330-223305@2x.png)  
 master界面效果:  
 ![image](https://github.com/sunteng412/mrfox-cron/blob/master/file/WX20200330-221803@2x.png)  
 
