@@ -18,10 +18,14 @@ go实现分布式shell任务调度
 &emsp;这里只是初步的实现，目前正在开发java客户端所用的starter,实现分布式任务管理。由界面化动态控制task的执行时间及状态。并支持热更。
 
 憧憬:
-&emsp;1.实现通过ssh与服务器进行实时通信及互动
-&emsp;2.可作为调度系统保证应用的CI/CD,监听gitlab变化实现动态部署
-&emsp;3.机器的资源告罄钉钉预警及JVM监控
-&emsp;4.test/dev环境的资源(es7、mongo、TiDB、Mysql、Canal、Sentinel、Nacos)等的快速部署
+&emsp;1.实现通过ssh与服务器进行实时通信及互动  
+
+&emsp;2.可作为调度系统保证应用的CI/CD,监听gitlab变化实现动态部署  
+
+&emsp;3.机器的资源告罄钉钉预警及JVM监控  
+
+&emsp;4.test/dev环境的资源(es7、mongo、TiDB、Mysql、Canal、Sentinel、Nacos)等的快速部署  
+
 
 
 如何使用?
