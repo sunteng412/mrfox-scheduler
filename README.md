@@ -14,6 +14,7 @@ go实现分布式shell任务调度
 &nbsp;我们可以考虑实现一套基于cron的任务调度器，该项目基于golang进行实现，通过此代码可以学习到多任务调度实现逻辑、使用etcd实现分布式锁、任务分发、日志的异步处理事件广播及机器的服务注册发现。  
 
 整体架构如下：
+![image](https://github.com/sunteng412/mrfox-cron/blob/master/file/WX20200330-220838%402x.png)
 
 &emsp;应用角色分为master和worker,master负责作为B端负责任务管理、服务发现及日志管理，而worker负责任务调度嵌在服务器中，其中模块包含任务调度、本地任务同步、日志转储及注册应用。下面是worker和master的架构流程图以及master上的流程示例
 
