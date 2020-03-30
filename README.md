@@ -42,7 +42,7 @@ master界面效果:
 
 &emsp;3.机器的资源告罄钉钉预警及JVM监控  
 
-&emsp;4.test/dev环境的资源(es7、mongo、TiDB、Mysql、Canal、Sentinel、Nacos)等的快速部署  
+&emsp;4.test/dev环境的资源(es7、mongo、Mysql、Canal、Sentinel、Nacos)等的快速部署  
 
 
 
