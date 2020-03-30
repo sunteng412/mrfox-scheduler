@@ -1,0 +1,33 @@
+#启动端口
+cron:
+    port: :8081
+#etcd配置
+etcd:
+    #连接地址,集群用,分割
+    endpoints: 10.211.55.7:2379
+    #连接超时时间-单位:秒
+    dialTimeout: 5
+worker:
+    #心跳间隔时间-单位:秒
+    heartbeatTime: 3
+    #分组名
+    group: 本地mac
+    #是否是容器应用-1:是,0-否
+    isContainer: 0
+    #宿主机ip
+    #mainMachineIp:
+    #宿主机内对应22端口
+    #mainMachineSSHPort:
+    #日志批次上传阈值
+    jobLogBatchSize: 100
+    #如果日志未超过阈值,但是间隔时间超过N秒之后,也会自动上传执行日志
+    writeJobLogCommitTimeout: 5
+mongo:
+    #连接地址
+    uri: mongodb://10.211.55.4:27017/cron
+    #连接超时时间-单位:秒
+    connectTimeOut: 5
+    userName: cron
+    password: cron
+    #database
+    database: cron

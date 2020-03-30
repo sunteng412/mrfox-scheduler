@@ -1,0 +1,23 @@
+log:
+    #日志路径
+    path: /Users/mrfox/golandProject/mrfox-cron/github.com/mrfox/master/log/info.log
+    #console-打印控制台/file-指定输出到文件/all-同时输出到文件和控制台
+    logType: console
+#启动端口
+cron:
+    port: :8080
+#etcd配置
+etcd:
+    #连接地址,集群用,分割
+    endpoints: 10.211.55.7:2379
+    #连接超时时间-单位:秒
+    dialTimeout: 5
+mongo:
+    #连接地址
+    uri: mongodb://10.211.55.4:27017/cron
+    #连接超时时间-单位:秒
+    connectTimeOut: 5
+    userName: cron
+    password: cron
+    #database
+    database: cron

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>机器管理</title>
+    <!-- bootstrap + jquery -->
+
+    <!-- vuejs  , reactjs , angular -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+</head>
+<body>
+
+
+    <div class="" style="float: left;width:20%;margin-top: 42px">
+        <div class="col-sm-4" style="width: 100%">
+            <div id="treeview2" class="">
+            </div>
+        </div>
+    </div>
+
+<div class="container-fluid"  style="float:right;width: 80%;">
+    <!-- 页头 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h2>分布式调度<small>-机器管理</small></h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- 功能按钮 -->
+    <div class="row">
+        <div class="col-md-12">
+            <!--<button type="button" class="btn btn-primary" id="new-job">新建任务</button>
+            <button type="button" class="btn btn-success" id="list-worker">健康节点</button>-->
+        </div>
+    </div>
+
+    <!-- 任务列表 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default" style="margin-top: 20px">
+                <div class="panel-body">
+                    <table id="machine-list"  class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>机器IP</th>
+                            <th>机器组别</th>
+                            <th>是否是容器</th>
+                            <th>机器心跳间隔</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <td></td>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- position: fixed -->
+<div id="edit-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">编辑机器</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="edit-name">机器IP</label>
+                        <input type="text" class="form-control" id="edit-ip" placeholder="机器ip">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-group">机器组名</label>
+                        <input type="text" class="form-control" id="edit-group" placeholder="机器组名">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-isContainer">是否是容器</label>
+                        <input type="text" class="form-control" id="edit-isContainer" placeholder="是否是容器">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-heartbeatTime">机器心跳间隔</label>
+                        <input type="text" class="form-control" id="edit-heartbeatTime" placeholder="cron表达式">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="save-job">保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+    <!--  日志模态框 -->
+    <div id="log-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">任务日志</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="log-list" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ip</th>
+                            <th>shell命令</th>
+                            <th>错误原因</th>
+                            <th>脚本输出</th>
+                            <th>计划开始时间</th>
+                            <th>实际调度时间</th>
+                            <th>开始执行时间</th>
+                            <th>执行结束时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+<!-- Script -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+<script>
+    $(function() {
+
+        // 设置树的相关属性并构造树
+        $('#treeview2').treeview({
+            color: "#428bca",
+            expandIcon: 'glyphicon glyphicon-chevron-right',
+            collapseIcon: 'glyphicon glyphicon-chevron-down',
+            nodeIcon: 'glyphicon glyphicon-bookmark',
+            data: getTree()
+        });
+
+        //定义树里的数据来源
+        function getTree(){
+            var data = [
+                {
+                    text: '任务调度',
+                    href: 'www.baidu.com',
+                    tags: ['0'],
+
+                },
+                {
+                    text: '机器管理',
+                    href: 'www.baidu.com',
+                    tags: ['0']
+                }
+                // },
+                // {
+                //     text: 'CI/CD',
+                //     href: '#parent3',
+                //     tags: ['0']
+                // }
+            ];
+            return data;
+        }
+
+
+        function setOnClick(){
+            //设置菜单点击事件
+            $('li[data-nodeid=0]').attr("onclick","location.href='/'");
+            //$('li[data-nodeid=2]').attr("onclick","location.href='/cicd.html'");
+        }
+        setOnClick()
+
+
+
+
+
+
+        // 时间格式化函数
+        function timeFormat(millsecond) {
+            // 前缀补0: 2018-08-07 08:01:03.345
+            function paddingNum(num, n) {
+                var len = num.toString().length
+                while (len < n) {
+                    num = '0' + num
+                    len++
+                }
+                return num
+            }
+            var date = new Date(millsecond)
+            var year = date.getFullYear()
+            var month = paddingNum(date.getMonth() + 1, 2)
+            var day = paddingNum(date.getDate(), 2)
+            var hour = paddingNum(date.getHours(), 2)
+            var minute = paddingNum(date.getMinutes(), 2)
+            var second = paddingNum(date.getSeconds(), 2)
+            var millsecond = paddingNum(date.getMilliseconds(), 3)
+            return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + "." + millsecond
+        }
+
+        // 1, 绑定按钮的事件处理函数
+        // 用javascript委托机制, DOM事件冒泡的一个关键原理
+        // 编辑机器
+        $("#machine-list").on("click", ".edit-job", function(event) {
+            // 取当前job的信息，赋值给模态框的input
+            $('#edit-ip').val($(this).parents('tr').children('.machine-ip').text())
+            $('#edit-group').val($(this).parents('tr').children('.machine-group').text())
+            $('#edit-isContainer').val($(this).parents('tr').children('.machine-isContainer').text())
+            $('#edit-heartbeatTime').val($(this).parents('tr').children('.machine-heartbeatTime').text())
+            // 弹出模态框
+            $('#edit-modal').modal('show')
+        })
+        // 下线
+        $("#machine-list").on("click", ".delete-job", function(event) { // javascript bind
+            var jobName = $(this).parents("tr").children(".job-name").text()
+            $.ajax({
+                url: '/job/delete',
+                type: 'post',
+                dataType: 'json',
+                data: {name: jobName},
+                complete: function() {
+                    window.location.reload()
+                }
+            })
+        })
+
+        // 下线机器
+        $("#machine-list").on("click", ".kill-job", function(event) {
+            var jobName = $(this).parents("tr").children(".job-name").text()
+            $.ajax({
+                url: '/job/kill',
+                type: 'post',
+                dataType: 'json',
+                data: {name: jobName},
+                success:function(data){
+                    if(data.code ==200) {
+                        alert("强杀["+jobName+"]任务成功")
+                    }else {
+                        alert(data.error)
+                    }                },
+                complete: function() {
+                    window.location.reload()
+                }
+            })
+        })
+
+        // 保存任务
+        $('#save-job').on('click', function() {
+            var jobInfo = {name: $('#edit-name').val(), command: $('#edit-command').val(), cronExpr: $('#edit-cronExpr').val()}
+            $.ajax({
+                url: '/job/save',
+                type: 'post',
+                dataType: 'json',
+                contentType:'application/json',
+                data:  JSON.stringify(jobInfo),
+                success:function(data){
+                    console.log(data)
+                    if (data.code != 200){
+                        alert(data.error)
+                    }else {
+                        window.location.reload()
+                    }
+                }
+            })
+        })
+        // 新建任务
+        $('#new-job').on('click', function() {
+            $('#edit-name').val("")
+            $('#edit-command').val("")
+            $('#edit-cronExpr').val("")
+            $('#edit-modal').modal('show')
+        })
+        // 查看任务日志
+        $("#machine-list").on("click", ".log-worker", function(event) {
+            // 清空日志列表
+            $('#log-list tbody').empty()
+
+            // 获取任务名
+            var ip = $(this).parents('tr').children('.machine-ip').text()
+
+            // 请求/worker/log接口
+            $.ajax({
+                url: "/worker/log",
+                dataType: 'json',
+                data: {ip: ip},
+                success: function(resp) {
+                    if (resp.code != 200) {
+                        return
+                    }
+                    // 遍历日志
+                    // 遍历日志
+                    var logList = resp.data
+                    console.log(logList)
+                    for (var i = 0; i < logList.length; ++i) {
+                        var log = logList[i]
+                        var tr = $('<tr>')
+                        tr.append($('<td>').html(log.workerIp))
+                        tr.append($('<td>').html(log.command))
+                        tr.append($('<td>').html(log.err))
+                        tr.append($('<td>').html(log.output))
+                        tr.append($('<td>').html(timeFormat(log.planTime)))
+                        tr.append($('<td>').html(timeFormat(log.scheduleTime)))
+                        tr.append($('<td>').html(timeFormat(log.startTime)))
+                        tr.append($('<td>').html(timeFormat(log.endTime)))
+                        console.log(tr)
+                        $('#log-list tbody').append(tr)
+                    }
+                }
+            })
+
+            // 弹出模态框
+            $('#log-modal').modal('show')
+        })
+
+
+        // 2，定义一个函数，用于刷新任务列表
+        function rebuildJobList() {
+            // /job/list
+            $.ajax({
+                url: '/worker/list',
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp.code != 200) {  // 服务端出错了
+                        return
+                    }
+                    // 任务数组
+                    var machineList = resp.data
+                    // 清理列表
+                    $('#machine-list tbody').empty()
+                    // 遍历任务, 填充table
+                    for (var i = 0; i < machineList.length; ++i) {
+                        var machine = machineList[i];
+                        if(machine != null){
+                            var tr = $("<tr>")
+                            tr.append($('<td class="machine-ip">').html(machine.ip))
+                            tr.append($('<td class="machine-group">').html(machine.group))
+                            tr.append($('<td class="machine-isContainer">').html(machine.isContainer==1?'是':'否'))
+                            tr.append($('<td class="machine-heartbeatTime">').html(machine.heartbeatTime))
+                            var toolbar = $('<div class="btn-toolbar">')
+                                .append('<button class="btn btn-info edit-job">编辑</button>')
+                                .append('<button class="btn btn-danger delete-job">强制下线</button>')
+                                .append('<button class="btn btn-warning log-worker">日志</button>')
+                                .append('<button class="btn btn-success ssh-worker">SSH</button>')
+                            tr.append($('<td>').append(toolbar))
+                            $("#machine-list").append(tr)
+                            console.log(tr)
+                        }
+
+                    }
+                }
+            })
+        }
+        rebuildJobList()
+    });
+
+
+    // // 页面加载完成后, 回调函数
+    // $(document).ready(function() {
+    //
+    // })
+</script>
+
+</body>
+</html>
