@@ -1,0 +1,9 @@
+*.md linguist-language=Golang 
+*.yml linguist-language=Golang 
+*.html linguist-language=Golang 
+*.js linguist-language=Golang 
+*.xml linguist-language=Golang 
+*.css linguist-language=Golang 
+*.sql linguist-language=Golang 
+*.uml linguist-language=Golang 
+*.cmd linguist-language=Golang 
